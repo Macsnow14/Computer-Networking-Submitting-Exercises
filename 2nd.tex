@@ -1,7 +1,7 @@
 % @Author: Macsnow
 % @Date:   2017-04-16 15:38:03
 % @Last Modified by:   Macsnow
-% @Last Modified time: 2017-04-16 18:05:46
+% @Last Modified time: 2017-04-16 19:05:00
 
 \section{Additional problems}
 
@@ -97,6 +97,146 @@
 \end{enumerate}
 
 \section{Problems on textbook}
+\subsection{Chapter 2}
+
+\begin{enumerate}
+    
+    \item [P1.] True or false?
+
+    \begin{enumerate}
+        \item A user requests a Web page that consists of some text and three images. For this page, the client will send one request message and receive four response messages.
+
+        \item Two distinct Web pages (for example, www.mit.edu/research.html and www.mit.edu/students.html) can be sent over the same persistent connection.
+
+        \item With nonpersistent connections between browser and origin server, it is possible for a single TCP segment to carry two distinct HTTP request messages.
+
+        \item The Date: header in the HTTP response message indicates when the object in the response was last modified.
+
+        \item HTTP response messages never have an empty message body
+    \end{enumerate}
+    
+    \textbf{Answer:}
+    
+    \begin{enumerate}
+        \item \textbf{False}
+        
+        In HTTP, each request is bond to a related response. so in this case client will send 4 requests and receive 4 response.
+        
+        \item \textbf{True}
+        
+        HTTP/1.1 support persistent connection so that different page request can be sent by the same connection.
+        
+        \item \textbf{False}
+        
+        Can a single TCP segment carry even one HTTP request? No.
+        
+        \item \textbf{False}
+        
+        According to RFC 2616: The Date general-header field represents the date and time at which the message was originated.
+        
+        \item \textbf{False}
+        
+        When we got a state code of 204.
+        
+    \end{enumerate}
+    
+    \item [P6.] Obtain the HTTP/1.1 specification (RFC 2616). Answer the following questions: 
+    
+    \begin{enumerate}
+    
+        \item Explain the mechanism used for signaling between the client and server to indicate that a persistent connection is being closed. Can the client, the server, or both signal the close of a connection?
+        
+        \item What encryption services are provided by HTTP?
+        
+        \item Can a client open three or more simultaneous connections with a given server?
+        
+        \item Either a server or a client may close a transport connection between them if either one detects the connection has been idle for some time. Is it possible that one side starts closing a connection while the other side is transmitting data via this connection? Explain.
+        
+    \end{enumerate}
+    
+    \textbf{Answer:}
+    
+    \begin{enumerate}
+        
+        \item According to RFC 2616: The Connection general-header field allows the sender to specify options that are desired for that particular connection and MUST NOT be communicated by proxies over further connections.
+        
+        So only client can specify whether the connection will be close.
+        
+        \item No. HTTP dose not provide any encryption services.
+        
+        That's why HTTPS was born.
+        
+        \item Due to RFC 2616 "Clients that use persistent connections should limit the number of simultaneous connections that they maintain to a given server. A single-user client SHOULD NOT maintain more than 2 connections with any server or proxy."
+        
+        It says should not but you can.
+        
+        \item Due to RFC 2616 "A client might have started to send a new request at the same time that the server has decided to close the "idle" connection. From the server's point of view, the connection is being closed while it was idle, but from the client's point of view, a request is in progress."
+        
+        So it is possible.
+        
+    \end{enumerate}
+    
+\end{enumerate}
+    
+
+\subsection{Chapter 3}
+
+\begin{enumerate}
+    \item [P1.] Suppose Client A initiates a Telnet session with Server S. At about the same time, Client B also initiates a Telnet session with Server S. Provide possible source and destination port numbers for
+    
+    \begin{enumerate}
+        \item The segments sent from A to S.
+        
+        \item The segments sent from B to S.
+        
+        \item The segments sent from S to A.
+        
+        \item The segments sent from S to B.
+        
+        \item If A and B are different hosts, is it possible that the source port number in the segments from A to S is the same as that from B to S?
+        
+        \item How about if they are the same host?        
+    \end{enumerate}
+    
+    \textbf{Answer:}
+    
+    \begin{enumerate}
+        \item \begin{itemize}
+            \item source port: depends on client A's computer's situation. Theoretical it can be range from 1024 to 65536. let's say it is 8910. 
+            \item destination port: 23.
+        \end{itemize}
+        
+        \item \begin{itemize}
+            \item source port: same situation with (a), let's say 2345.
+            \item destination port: 23.
+        \end{itemize}
+        
+        \item \begin{itemize}
+            \item source port: 23.
+            \item destination port: 8910.
+        \end{itemize}
+        
+        \item \begin{itemize}
+            \item source port: 23.
+            \item destination port: 2345.
+        \end{itemize}
+        
+        \item If A and B are different hosts, then the source port number in the segments from A to S is utterly possible the same as that from B to S.
+        
+        \item And if the are the same host. segments from A to S can't be the same as that from B to S. Otherwise the server can't tell the difference between A and B, and that is a forbidden condition.
+    \end{enumerate}
+    
+    \item [P6.] Consider our motivation for correcting protocol rdt2.1. Show that the receiver, shown in Figure 3.57, when operating with the sender shown in Figure 3.11, can lead the sender and receiver to enter into a deadlock state, where each is waiting for an event that will never occur.
+    
+    \textbf{Answer:}
+    
+    Consider situation described below:
+    
+    Now the sender start from state "wait for 1 from above and then send data. At the same time the receiver at the state of "wait for 1 from below and then received the seq 1 data correctly and send ACK to sender and receiver itself transit to state "wait for 0 from below", but ACK message is corrupted so the sender will send seq 1 data over and over again, the receiver are waiting for seq 0 data right now which will never occur.
+    
+    This is a deadlock situation.
+    
+\end{enumerate}
 
 \begin{enumerate}
     \item [P1.] Suppose Client A initiates a Telnet session with Server S. At about the same time, Client B also initiates a Telnet session with Server S. Provide possible source and destination port numbers for
