@@ -1,0 +1,156 @@
+% @Author: Macsnow
+% @Date:   2017-04-16 15:38:03
+% @Last Modified by:   Macsnow
+% @Last Modified time: 2017-04-16 18:05:46
+
+\section{Additional problems}
+
+\begin{enumerate}
+    \item Explain precisely following abbreviations:
+
+    \begin{itemize}
+        \item [-] \textbf{URL, HTML, RTT, MIME, TFTP, NFS, SNMP, JPEG, MPEG}
+    \end{itemize}
+    
+    \textbf{Answer:}
+    
+    \begin{itemize}
+        \item \textbf{URL}
+        
+        A \textbf{Uniform Resource Locator (URL)}, commonly informally termed a \textbf{web address} (a term which is not defined identically) is a reference to a web resource that specifies its location on a computer network and a mechanism for retrieving it.
+        
+        \item \textbf{HTML}
+        
+        \textbf{Hypertext Markup Language (HTML)} is the standard markup language for creating web pages and web applications. With Cascading Style Sheets (CSS) and JavaScript it forms a triad of cornerstone technologies for the World Wide Web
+        
+        \item \textbf{RTT}
+        
+        In telecommunications, the \textbf{round-trip delay time (RTD)} or \textbf{round-trip time (RTT)} is the length of time it takes for a signal to be sent plus the length of time it takes for an acknowledgment of that signal to be received. This time delay therefore consists of the propagation times between the two points of a signal.
+        
+        \item \textbf{MIME}
+        
+        \textbf{Multipurpose Internet Mail Extensions (MIME)} is an Internet standard that extends the format of email to support:
+        
+        \begin{itemize}            
+            \item Text in character sets other than ASCII
+            
+            \item Non-text attachments: audio, video, images, application programs etc.
+            
+            \item Message bodies with multiple parts
+            
+            \item Header information in non-ASCII character sets
+            
+        \end{itemize}
+        
+        \item \textbf{NFS}
+        
+        \textbf{Network File System (NFS)} is a distributed file system protocol originally developed by Sun Microsystems in 1984, allowing a user on a client computer to access files over a computer network much like local storage is accessed.
+        
+        \item \textbf{SNMP}
+        
+        \textbf{Simple Network Management Protocol (SNMP)} is an Internet-standard protocol for collecting and organizing information about managed devices on IP networks and for modifying that information to change device behavior.
+        
+        \item \textbf{JPEG}
+        
+        \textbf{JPEG} is a commonly used method of lossy compression for digital images, particularly for those images produced by digital photography.
+        
+        The term "JPEG" is an initialism/acronym for the Joint Photographic Experts Group.
+        
+        \item \textbf{MPEG}
+        
+        \textbf{The Moving Picture Experts Group (MPEG)} is a working group of authorities that was formed by ISO and IEC to set standards for audio and video compression and transmission.
+        
+    \end{itemize}
+    
+    \item Specify following system Organization:
+    
+    \begin{itemize}
+        \item [-] \textbf{Email system, DNS system}
+    \end{itemize}
+    
+    \textbf{Answer:}
+    
+    \begin{itemize}
+        \item \textbf{Email system}
+        
+        \textbf{Electronic mail}, or email, is a method of exchanging digital messages between people using digital devices such as computers and mobile phones.
+        It has three major components: user agents, mail servers, \textbf{and the Simple Mail Transfer Protocol (SMTP).}
+        
+        User agents allow users to read, reply to, forward, save, and compose messages.
+        
+        Mail servers form the core of the e-mail infrastructure. Each recipient has a mailbox located in one of the mail servers.
+        
+        SMTP is the principal application-layer protocol for Internet electronic mail. It uses the reliable data transfer service of TCP to transfer mail from the sender’s mail server to the recipient’s mail server.
+        
+        Also, there are several Mail Access Protocol such as \textbf{POP3}, \textbf{IMAP}, and Web-based E-mail using \textbf{HTTP} protocol.
+        
+        \item \textbf{DNS system}
+        
+        \textbf{The Domain Name System (DNS)} is a hierarchical decentralized naming system for computers, services, or other resources connected to the Internet or a private network.
+        
+        DNS system can be roughly divide into three level: root DNS servers, Top-Level domain servers, and authoritative DNS servers. And there is another kind of DNS servers called local DNS servers which provides DNS caching services.
+        
+        The Domain Name System is maintained by a distributed database system, which uses the client–server model. The nodes of this database are the name servers. Each domain has at least one authoritative DNS server that publishes information about that domain and the name servers of any domains subordinate to it. The top of the hierarchy is served by the root name servers, the servers to query when looking up (resolving) a TLD.
+    \end{itemize}
+    
+
+\end{enumerate}
+
+\section{Problems on textbook}
+
+\begin{enumerate}
+    \item [P1.] Suppose Client A initiates a Telnet session with Server S. At about the same time, Client B also initiates a Telnet session with Server S. Provide possible source and destination port numbers for
+    
+    \begin{enumerate}
+        \item The segments sent from A to S.
+        
+        \item The segments sent from B to S.
+        
+        \item The segments sent from S to A.
+        
+        \item The segments sent from S to B.
+        
+        \item If A and B are different hosts, is it possible that the source port number in the segments from A to S is the same as that from B to S?
+        
+        \item How about if they are the same host?        
+    \end{enumerate}
+    
+    \textbf{Answer:}
+    
+    \begin{enumerate}
+        \item \begin{itemize}
+            \item source port: depends on client A's computer's situation. Theoretical it can be range from 1024 to 65536. let's say it is 8910. 
+            \item destination port: 23.
+        \end{itemize}
+        
+        \item \begin{itemize}
+            \item source port: same situation with (a), let's say 2345.
+            \item destination port: 23.
+        \end{itemize}
+        
+        \item \begin{itemize}
+            \item source port: 23.
+            \item destination port: 8910.
+        \end{itemize}
+        
+        \item \begin{itemize}
+            \item source port: 23.
+            \item destination port: 2345.
+        \end{itemize}
+        
+        \item If A and B are different hosts, then the source port number in the segments from A to S is utterly possible the same as that from B to S.
+        
+        \item And if the are the same host. segments from A to S can't be the same as that from B to S. Otherwise the server can't tell the difference between A and B, and that is a forbidden condition.
+    \end{enumerate}
+    
+    \item [P6.] Consider our motivation for correcting protocol rdt2.1. Show that the receiver, shown in Figure 3.57, when operating with the sender shown in Figure 3.11, can lead the sender and receiver to enter into a deadlock state, where each is waiting for an event that will never occur.
+    
+    \textbf{Answer:}
+    
+    Consider situation described below:
+    
+    Now the sender start from state "wait for 1 from above and then send data. At the same time the receiver at the state of "wait for 1 from below and then received the seq 1 data correctly and send ACK to sender and receiver itself transit to state "wait for 0 from below", but ACK message is corrupted so the sender will send seq 1 data over and over again, the receiver are waiting for seq 0 data right now which will never occur.
+    
+    This is a deadlock situation.
+    
+\end{enumerate}
