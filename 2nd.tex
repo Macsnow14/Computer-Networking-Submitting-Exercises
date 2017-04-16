@@ -1,7 +1,7 @@
 % @Author: Macsnow
 % @Date:   2017-04-16 15:38:03
 % @Last Modified by:   Macsnow
-% @Last Modified time: 2017-04-16 19:05:00
+% @Last Modified time: 2017-04-16 19:08:50
 
 \section{Additional problems}
 
@@ -180,63 +180,6 @@
     
 
 \subsection{Chapter 3}
-
-\begin{enumerate}
-    \item [P1.] Suppose Client A initiates a Telnet session with Server S. At about the same time, Client B also initiates a Telnet session with Server S. Provide possible source and destination port numbers for
-    
-    \begin{enumerate}
-        \item The segments sent from A to S.
-        
-        \item The segments sent from B to S.
-        
-        \item The segments sent from S to A.
-        
-        \item The segments sent from S to B.
-        
-        \item If A and B are different hosts, is it possible that the source port number in the segments from A to S is the same as that from B to S?
-        
-        \item How about if they are the same host?        
-    \end{enumerate}
-    
-    \textbf{Answer:}
-    
-    \begin{enumerate}
-        \item \begin{itemize}
-            \item source port: depends on client A's computer's situation. Theoretical it can be range from 1024 to 65536. let's say it is 8910. 
-            \item destination port: 23.
-        \end{itemize}
-        
-        \item \begin{itemize}
-            \item source port: same situation with (a), let's say 2345.
-            \item destination port: 23.
-        \end{itemize}
-        
-        \item \begin{itemize}
-            \item source port: 23.
-            \item destination port: 8910.
-        \end{itemize}
-        
-        \item \begin{itemize}
-            \item source port: 23.
-            \item destination port: 2345.
-        \end{itemize}
-        
-        \item If A and B are different hosts, then the source port number in the segments from A to S is utterly possible the same as that from B to S.
-        
-        \item And if the are the same host. segments from A to S can't be the same as that from B to S. Otherwise the server can't tell the difference between A and B, and that is a forbidden condition.
-    \end{enumerate}
-    
-    \item [P6.] Consider our motivation for correcting protocol rdt2.1. Show that the receiver, shown in Figure 3.57, when operating with the sender shown in Figure 3.11, can lead the sender and receiver to enter into a deadlock state, where each is waiting for an event that will never occur.
-    
-    \textbf{Answer:}
-    
-    Consider situation described below:
-    
-    Now the sender start from state "wait for 1 from above and then send data. At the same time the receiver at the state of "wait for 1 from below and then received the seq 1 data correctly and send ACK to sender and receiver itself transit to state "wait for 0 from below", but ACK message is corrupted so the sender will send seq 1 data over and over again, the receiver are waiting for seq 0 data right now which will never occur.
-    
-    This is a deadlock situation.
-    
-\end{enumerate}
 
 \begin{enumerate}
     \item [P1.] Suppose Client A initiates a Telnet session with Server S. At about the same time, Client B also initiates a Telnet session with Server S. Provide possible source and destination port numbers for
