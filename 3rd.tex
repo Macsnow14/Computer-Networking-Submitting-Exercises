@@ -1,0 +1,520 @@
+% @Author: Macsnow
+% @Date:   2017-04-30 16:30:17
+% @Last Modified by:   Macsnow
+% @Last Modified time: 2017-05-01 18:39:02
+
+\section{Additional problems}
+
+\begin{enumerate}
+    \item Explain precisely following abbreviations:
+    \begin{itemize}
+        \item[-] \textbf{UDP, FSM, ABR, EFCI, AIMD, MSS}
+    \end{itemize}
+    
+    \textbf{Answer:}
+    
+    \begin{itemize}
+        \item UDP
+        
+        the \textbf{User Datagram Protocol (UDP)} is one of the core members of the Internet protocol suite. When a UDP message is sent, it cannot be known if it will reach its destination; it could get lost along the way. There is no concept of acknowledgment, retransmission, or timeout.
+        
+        \item FSM
+        
+        \textbf{A finite-state machine (FSM)} or \textbf{finite-state automaton (FSA}, plural: automata), \textbf{finite automaton}, or simply a \textbf{state machine}, is a mathematical model of computation. It is an abstract machine that can be in exactly one of a finite number of states at any given time. The FSM can change from one state to another in response to some external inputs; the change from one state to another is called a transition. A FSM is defined by a list of its states, its initial state, and the conditions for each transition.
+        
+        \item ABR
+        
+        \textbf{Available bit rate (ABR)} is a service used in ATM networks when source and destination don't need to be synchronized. ABR does not guarantee against delay or data loss. ABR mechanisms allow the network to allocate the available bandwidth fairly over the present ABR sources. ABR is one of five service categories defined by the ATM Forum for use in an ATM Network.
+        
+        \item EFCI
+        
+        \item AIMD
+        
+        The \textbf{additive-increase/multiplicative-decrease (AIMD)} algorithm is a feedback control algorithm best known for its use in TCP congestion control. AIMD combines linear growth of the congestion window with an exponential reduction when a congestion takes place.
+        
+        \item MSS
+        
+        \textbf{The maximum segment size (MSS)} is a parameter of the options field of the TCP header that specifies the largest amount of data, specified in bytes, that a computer or communications device can receive in a single TCP segment.
+        
+    \end{itemize}
+    
+    \item Which services can TCP and UDP provide?
+    
+    \textbf{Answer:}
+    
+    \begin{itemize}
+        \item TCP
+        TCP provides reliable data transmission service and may took price of real-time. So services which needs reliable and is non-Time-Sensitive use TCP such as HTTP, SMTP, FTP etc.
+        
+        \item UDP
+        UDP provides unreliable but light and fast data transmission service. Therefore services which is loss-tolerant and is time-sensitive use UDP e.g. DNS skype etc.
+        
+    \end{itemize}
+    
+    \item Write following TCP algorithms:
+    \begin{itemize}
+        \item[-] Reliable sending
+        \item[-] Reliable receiving
+        \item[-] Flow control
+        \item[-] Congestion control
+    \end{itemize}
+    
+    \textbf{Answer:}
+    
+    \begin{itemize}
+        \item Reliable sending
+        \begin{lstlisting}
+loop (forever) {
+    switch(event)
+    
+        event: data received from application above
+            create TCP segment with sequence number NextSeqNum
+                if (timer currently not running && rwnd is not full)
+                    start timer
+            pass segment to IP
+            NextSeqNum=NextSeqNum+length(data)
+            break;
+            
+        event: timer timeout
+            retransmit not-yet-acknowledged segment with
+                smallest sequence number
+            start timer
+            break;
+            
+        event: ACK received, with ACK field value of y
+            if (y > SendBase) {
+                SendBase=y
+                if (there are currently any not-yet-acknowledged segments)
+                    start timer
+            }
+            break;
+            
+}
+
+        \end{lstlisting}
+        
+        \item Reliable receiving
+        
+        \begin{lstlisting}
+loop (forever) {
+    switch(event)
+    
+        event: in-order segment arrival, no gaps,
+               everything else already ACKed
+            if (no next segment in 500ms delay)
+                send ACK
+            break;
+            
+        event: in-order segment arrival, no gaps,
+               one delayed ACK pending
+            immediately send single cumulative ACK
+            break;
+
+        event: out-of-order segment arrival higher-than-expect
+               seq. # gap detected
+            send duplicate ACK, indicating seq. # of next expect byte
+            break;
+
+        event: arrival of segment that partially or
+               completely fills gap
+            if (segment starts at lower end of gap)
+                immediately ACK
+            break;
+}
+                
+        \end{lstlisting}
+        
+        \item Flow control
+
+        \begin{lstlisting}
+\* Sender: *\
+loop (forever) {
+    switch (event)
+        event: LastByteSend - LastByteAcked <= RcvWindow
+            keeps the amount of transmitted
+            break;
+
+        event: RcvWindow == 0
+            segments with one byte date are still send to the receiver
+            break;
+}
+
+\* Receiver: *\
+loop (forever) {
+    if (segment arrival)
+        explicitly informs sender of amount of free buffer space load in RcvWindow field in TCP segment.
+}
+        \end{lstlisting}        
+        \item Congestion control
+        \begin{lstlisting}
+init:
+    cwnd = 1 MSS
+    ssthrest = 64 KB
+    dupACKcount = 0
+
+loop (forever) {
+    switch(state)
+        state: Slow start
+            switch (event)
+                event: duplicate ACK
+                    dupACKcount++
+                    break;
+
+                event: new ACK
+                    cwnd = cwnd + MSS
+                    dupACKcount = 0
+                    break;
+
+                event: timeout
+                    ssthresh = cwnd / 2
+                    cwnd = 1 MSS
+                    dupACKcount = 0
+                    break;
+
+                event: cwnd >= ssthresh
+                    state = Congestion avoidance
+                    break;
+
+                event: dupACKcount == 3
+                    ssthresh = cwnd / 2
+                    cwnd = ssthresh + 3 * MSS
+                    state = Fast recovery
+                    break;
+
+        state: Congestion avoidance
+            switch (event)
+                event: new ACK
+                    cwnd = cwnd + MSS * (MSS / cwnd) 
+                    dupACKcount = 0
+                    break;
+
+                event: duplicate ACK
+                    dupACKcount++
+                    break;
+
+                event: dupACKcount == 3
+                    ssthresh = cwnd / 2
+                    cwnd = ssthresh + 3 * MSS
+                    state = Fast recovery
+                    break;
+
+                event: timeout
+                    ssthresh = cwnd / 2
+                    cwnd = 1 MSS
+                    dupACKcount = 0
+                    state = Slow start
+                    break;
+
+        state: Fast recovery
+            switch (event)
+                event: duplicate ACK
+                    dupACKcount++
+                    break;
+
+                event: timeout
+                    ssthresh = cwnd / 2
+                    cwnd = 1 MSS
+                    dupACKcount = 0
+                    state = Slow start
+                    break;
+
+                event: new ACK
+                    cwnd = cwnd + MSS * (MSS / cwnd) 
+                    dupACKcount = 0
+                    state = Congestion avoidance
+                    break;
+}
+
+        \end{lstlisting}
+    \end{itemize}
+    
+    
+\end{enumerate}
+
+\section{Problems on textbook}
+\subsection{Review questions}
+
+\begin{enumerate}
+    \item[R3.] Consider a TCP connection between Host A and Host B. Suppose that the TCP segments traveling from Host A to Host B have source port number x and destination port number y. What are the source and destination port numbers for the segments traveling from Host B to Host A?
+
+    \textbf{Answer:}
+
+    For the segments traveling from host B to A, source port number is x, and destination port number is y.
+    
+    \item[R4.] Describe why an application developer might choose to run an application over UDP rather than TCP.
+
+    \textbf{Answer:}
+
+    When application is time-sensitive and is loss-tolerable which means it require real time data transport and few frames lost doesn't matter e.g. IP phone. Developer might choose UDP rather than TCP.
+    
+    \item[R7.] Suppose a process in Host C has a UDP socket with port number 6789. Suppose both Host Aand Host B each send a UDP segment to Host C with destination port number 6789. Will both of these segments be directed to the same socket at Host C? If so, how will the process at Host C know that these two segments originated from two different hosts?
+
+    \textbf{Answer:}
+
+    UDP datagram will be filled in IP data field, in IP header there is a host address(IP) field to identify which host datagram will be send to. Therefore even both two application are using port \# 6789, two socket still won't be treated as a same socktet.
+
+\end{enumerate}
+
+\subsection{Problems}
+
+\begin{enumerate}
+    \item[P4.]
+    \begin{enumerate}
+        \item Suppose you have the following 2 bytes: 01011100 and 01100101. What is the 1s complement of the sum of these 2 bytes?
+        \item Suppose you have the following 2 bytes: 11011010 and 01100101. What is the 1s complement of the sum of these 2 bytes?
+        \item For the bytes in part (a), give an example where one bit is flipped in each of the 2 bytes and yet the 1s complement doesn’t change.
+    \end{enumerate}
+
+    \textbf{Answer: }
+
+    \begin{enumerate}
+        \item sum of two bytes is 11000001, and the 1s complement is 00111110.
+        \item sum of two bytes is 00111111, and the 1s complement is 11000000.
+        \item when first is 01111100 and the second is 01000101.
+    \end{enumerate}
+    
+    \item[P10.] Consider a channel that can lose packets but has a maximum delay that is known. Modify protocol rdt2.1 to include sender timeout and retransmit. Informally argue why your protocol can communicate correctly over this channel.
+
+    \textbf{Answer:}
+
+    First give a modified protocol rdt2.1 pseudo-code to solve the problem:
+    \begin{lstlisting}
+\* sender: *\
+loop (forever) {
+    switch (state)
+        state: Wait for call 0 from above
+            if (rdt_send(data)) {
+                    sndpkt = make_pkt(0, data, checksum)
+                    udt_send(sndpkt)
+                    timeout = maxium delay
+                    start timer
+                    state = Wait for ACK or NAK 0
+            }
+
+        state: Wait for ACK or NAK 0
+            switch (event)
+                event: rdt_rcv(rcvpkt) && (corrupt(rcvpkt)
+                       || isNAK(rcvpkt))
+                    udt_send(sndpkt)
+                    break;
+
+                event: timeout
+                    udt_send(sndpkt)
+                    timeout = maxium delay
+                    start timer
+                    break;
+
+                event: rdt_rcv(rcvpkt) && notcorrupt(rcvpkt)
+                       && isAck (rcvpkt)
+                    state = Wait for call 1 from above
+                    break;
+
+        state: Wait for call 1 from above
+            if (rdt_send(data)) {
+                    sndpkt = make_pkt(0, data, checksum)
+                    udt_send(sndpkt)
+                    timeout = maxium delay
+                    start timer
+                    state = Wait for ACK or NAK 1
+            }
+
+        state: Wait for ACK or NAK 1 
+            switch (event)
+                event: rdt_rcv(rcvpkt) && (corrupt(rcvpkt)
+                       || isNAK(rcvpkt))
+                    udt_send(sndpkt)
+                    break;
+
+                event: timeout
+                    udt_send(sndpkt)
+                    timeout = maxium delay
+                    start timer
+                    break;
+
+                event: rdt_rcv(rcvpkt) && notcorrupt(rcvpkt)
+                       && isAck (rcvpkt)
+                    state = Wait for call 0 from above
+                    break;
+}
+
+\* receiver: Same as original rdt2.1*\
+loop (forever) {
+    switch (state)
+        state: Wait for 0 from below
+            switch (event)
+                event: rdt_rcv(rcvpkt) && corrupt(rcvpkt)
+                    sndpkt = make_pkt(NAK, checksum)
+                    udt_send(sndpkt)
+                    break;
+
+                event: rdt_rcv(rcvpkt) && notcorrupt(rcvpkt)
+                       && has_seq1(rcvpkt)
+                    sndpkt = make_pkt(ACK, checksum)
+                    udt_send(sndpkt)
+                    break;
+
+                event: rdt_rcv(rcvpkt) && notcorrupt(rcvpkt)
+                       && has_seq0(rcvpkt)
+                    extract(rcvpkt, data)
+                    deliver_data(data)
+                    sndpkt = make_pkt(ACK, checksum)
+                    utd_send(sndpkt)
+                    state = Wait for 1 from below
+                    break;
+
+        state: Wait for 1 from below
+            switch (event)
+                event: rdt_rcv(rcvpkt) && corrupt(rcvpkt)
+                    sndpkt = make_pkt(NAK, checksum)
+                    udt_send(sndpkt)
+                    break;
+
+                event: rdt_rcv(rcvpkt) && notcorrupt(rcvpkt)
+                       && has_seq0(rcvpkt)
+                    sndpkt = make_pkt(ACK, checksum)
+                    udt_send(sndpkt)
+                    break;
+
+                event: rdt_rcv(rcvpkt) && notcorrupt(rcvpkt)
+                       && has_seq1(rcvpkt)
+                    extract(rcvpkt, data)
+                    deliver_data(data)
+                    sndpkt = make_pkt(ACK, checksum)
+                    utd_send(sndpkt)
+                    state = Wait for 0 from below
+                    break;
+}
+
+    \end{lstlisting}
+
+    So why would this modified version of rdt2.1 work is such channel?
+
+    Let's first analyse the original protocol rdt2.1.
+    it was considered the situation that packet was corrupted but didn't consider the packet loss situation.
+
+    Unfortunately in this problem the channel do loss packet. so all we need is that add a timer and set it as maxium delay, once timeout was triggered, it means the packet was lost and then resend the packet, reset the timer, over and over again til ACK arrived.
+
+    Difference between my modified rdt2.1 version and rdt3.0 is just like the difference between original rdt2.1 and rdt2.2.
+    
+    \item[P16.] Suppose an application uses rdt 3.0 as its transport layer protocol. As the stop-and-wait protocol has very low channel utilization (shown in the crosscountry example), the designers of this application let the receiver keep sending back a number (more than two) of alternating ACK 0 and ACK 1 even if the corresponding data have not arrived at the receiver. Would this application design increase the channel utilization? Why? Are there any potential problems with this approach? Explain.
+
+    \textbf{Answer: }
+
+    Yes such application design dose increase the channel utilization because there is a trick to make sender believe all packet was correctly received by receiver and won't stop and wait.
+
+    The potential proplem is such trick would make rdt3.0 a unreliable protocol because sender won't know if a packet was lost.
+    
+    \item[P21.] Suppose we have two network entities, A and B. B has a supply of data messages that will be sent to A according to the following conventions. When A gets a request from the layer above to get the next data (D) message from B, A must send a request (R) message to B on the A-to-B channel. Only when B receives an R message can it send a data (D) message back to A on the B-toA channel. A should deliver exactly one copy of each D message to the layer above. R messages can be lost (but not corrupted) in the A-to-B channel; D messages, once sent, are always delivered correctly. The delay along both channels is unknown and variable.
+    
+    Design (give an FSM description of) a protocol that incorporates the appropriate mechanisms to compensate for the loss-prone A-to-B channel and implements message passing to the layer above at entity A, as discussed above. Use only those mechanisms that are absolutely necessary.
+    
+    \textbf{Answer: }
+
+    Because pseudo-code can precisely descript FSM, I'll give the pseudo-code. 
+
+    \begin{lstlisting}
+\* A *\
+init: timeout = empirical value
+
+loop (forever) {
+    switch (state)
+        state: Wait for Call from above
+            if (send(req)) {
+                R = make_pkt(req)
+                udt_send(R)
+                start timer
+                state = Wait for D
+            }
+        state: Wait for D
+            switch (event)
+                event: timeout
+                    udt_send(R)
+                    timeout *= 2
+                    start timer
+
+                event: rcv(D)
+                    extract(D, data)
+                    deliver_data(data)
+                    timeout = timer_value * 1.5
+                    state = Wait for call from above
+}
+
+\* B *\
+
+loop (forever) {
+    if (rcvR)) {
+        D = make_pkt(R)
+        udt_send(D)
+    }
+}
+    \end{lstlisting}
+
+    \item[P27.] Host A and B are communicating over a TCP connection, and Host B has already received from A all bytes up through byte 126. Suppose Host A then sends two segments to Host B back-to-back. The first and second segments contain 80 and 40 bytes of data, respectively. In the first segment, the sequence number is 127, the source port number is 302, and the destination port number is 80. Host B sends an acknowledgment whenever it receives a segment from Host A.
+    \begin{enumerate}
+        
+        \item In the second segment sent from Host A to B, what are the sequence number, source port number, and destination port number?
+        
+        \item If the first segment arrives before the second segment, in the acknowledgment of the first arriving segment, what is the acknowledgment number, the source port number, and the destination port number?
+        
+        \item If the second segment arrives before the first segment, in the acknowledgment of the first arriving segment, what is the acknowledgment number?
+        
+        \item Suppose the two segments sent by A arrive in order at B. The first acknowledgment is lost and the second acknowledgment arrives after the first timeout interval. Draw a timing diagram, showing these segments and all other segments and acknowledgments sent. (Assume there is no additional packet loss.) For each segment in your figure, provide the sequence number and the number of bytes of data; for each acknowledgment that you add, provide the acknowledgment number.
+    \end{enumerate}
+
+    \textbf{Answer: }
+
+    \begin{enumerate}
+        \item In the second segment sent from Host A to B, the sequence number is 207, source port number is 302, and destination port number is 80.
+        \item Acknowledgment number is 206, source port number is 80, destination port number is 302.
+        \item Acknowledgment number is 126.
+        \item sequence diagram:
+        
+        \begin{center}
+        \begin{tikzpicture}
+        \coordinate (A) at (2,5);
+        \coordinate (B) at (2,0);
+        \coordinate (C) at (6,5);
+        \coordinate (D) at (6,0);
+        
+        \draw[thick] (A)--(B) (C)--(D);
+        \draw (A) node[above]{\Large Host A};
+        \draw (C) node[above]{\Large Host B};
+        
+        \coordinate (E) at ($(A)!.1!(B)$);
+        
+        \coordinate (F) at ($(C)!.25!(D)$);
+        \draw[->] (E) -- (F) node[midway,sloped,above,scale=0.5]{\verb$seq = 127, 80 bytes$};
+        
+        \coordinate (G) at ($(A)!.15!(B)$);
+        
+        \coordinate (H) at ($(C)!.30!(D)$);
+        \draw[->] (G) -- (H) node[midway,sloped,above,scale=0.5]{\verb$seq = 207, 40 bytes$};
+        
+        \coordinate (I) at ($(A)!.4!(B)$);
+        \coordinate (I') at ($(F)!.8!(I)$);
+        \draw[->] (F) -- (I') node[midway,sloped,above,scale=0.5]{\verb$ACK = 206$};
+        
+        
+        \coordinate (J) at ($(A)!.45!(B)$);
+        \draw[->] (H) -- (J) node[midway,sloped,above,scale=0.5]{\verb$ACK = 246$};
+        
+        \coordinate (K) at ($(A)!.43!(B)$);
+        
+        \coordinate (L) at ($(C)!.58!(D)$);
+        \draw[->] (K) -- (L) node[midway,sloped,above,scale=0.5]{\verb$seq = 127, 80 bytes$};
+        
+        \coordinate (M) at ($(A)!.73!(B)$);
+        \draw[->] (L) -- (M) node[midway,sloped,above,scale=0.5]{\verb$ACK = 206$};
+        
+        % \draw[->] (I) -- (J) node[midway,sloped,above]{\verb$ACK$};
+        \end{tikzpicture}
+        \end{center}
+    \end{enumerate}
+    
+    \item[P33.] In Section 3.5.3, we discussed TCP’s estimation of RTT. Why do you think TCP avoids measuring the SampleRTT for retransmitted segments?
+    
+    \textbf{Answer: }
+    
+    When A segment ACK was delayed and arrive after timeout and resend the segment, the RTT of that segment would be a wrong value. So TCP avoids measuring SampleRTT.
+    
+\end{enumerate}
